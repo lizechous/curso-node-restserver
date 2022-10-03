@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
 
 
 class Server{
@@ -9,7 +10,12 @@ class Server{
     constructor(){
         this.app = express();
         this.port = process.env.PORT;
+
         this.usuariosPath = '/api/usuarios';
+        this.authPath = '/api/auth';
+
+        // Conectar a bds
+        this.conectarDB();
 
         //Middlewares --> funciones que siempre van a 
         //ejecutarse cuando levantemos el servidor
@@ -17,6 +23,11 @@ class Server{
 
         //Rutas de mi app
         this.routes();
+    }
+
+    // aqui me puedo conectar a varias
+    async conectarDB(){
+        await dbConnection();
     }
 
     middlewares(){
@@ -33,6 +44,7 @@ class Server{
     //Metodo de la ruta
     routes(){
         //middleware ruta
+        this.app.use(this.authPath, require('../routes/auth'));
         this.app.use(this.usuariosPath, require('../routes/usuarios'));
     }
 
